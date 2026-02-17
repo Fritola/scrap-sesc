@@ -6,6 +6,8 @@ import { Pool } from "pg";
 import { getOrCreateMenu } from "./menuService.js";
 import { scrapeBySlug } from "./scrappers/index.js";
 
+const PORT = process.env.PORT || 3000;
+
 const app = express();
 app.use(express.json());
 
@@ -99,6 +101,6 @@ app.get("/menu/:slug", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("🚀 API rodando em http://localhost:3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
