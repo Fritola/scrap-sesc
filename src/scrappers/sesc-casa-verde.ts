@@ -52,42 +52,42 @@ function parseDayCasaVerde(items: string[]): DayMenu {
     // SALADA
     const saladaMatch = text.match(/salada:\s*(.*)/i);
     if (saladaMatch) {
-      salada = saladaMatch[1];
+      salada = saladaMatch[1] ?? "";
       continue;
     }
 
     // CARNE
     const carneMatch = text.match(/op[cç][aã]o com carne:\s*(.*)/i);
     if (carneMatch) {
-      carne = carneMatch[1];
+      carne = carneMatch[1] ?? "";
       continue;
     }
 
     // VEGETARIANA
     const vegMatch = text.match(/op[cç][aã]o vegetariana:\s*(.*)/i);
     if (vegMatch) {
-      vegetariana = vegMatch[1];
+      vegetariana = vegMatch[1] ?? "";
       continue;
     }
 
     // GUARNIÇÃO
     const guarnicaoMatch = text.match(/guarni[cç][aã]o:\s*(.*)/i);
     if (guarnicaoMatch) {
-      guarnicao = guarnicaoMatch[1];
+      guarnicao = guarnicaoMatch[1] ?? "";
       continue;
     }
 
     // SOBREMESA
     const sobremesaMatch = text.match(/sobremesa:\s*(.*)/i);
     if (sobremesaMatch) {
-      sobremesa = sobremesaMatch[1];
+      sobremesa = sobremesaMatch[1] ?? "";
       continue;
     }
 
     // FRUTA
     const frutaMatch = text.match(/fruta:\s*(.*)/i);
     if (frutaMatch) {
-      fruta = frutaMatch[1];
+      fruta = frutaMatch[1] ?? "";
       continue;
     }
 
@@ -114,7 +114,7 @@ function extractDay(text: string): string | null {
   );
 
   if (match) {
-    return match[1].toLowerCase();
+    return match[1]?.toLowerCase() ?? "";
   }
 
   return null;

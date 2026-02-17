@@ -115,7 +115,7 @@ export async function scrapeSesc24Maio(): Promise<ScrapedMenu> {
   const slug = slugify(unidade);
 
   for (const dia of diasBrutos) {
-    const nomeDia = extractDayName(dia.day);
+    const nomeDia = extractDayName(dia.day) || "";
     diasEstruturados[nomeDia] = parseDay(dia.items);
   }
 
