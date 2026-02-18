@@ -20,7 +20,6 @@ function cleanText(text: string) {
 }
 
 function parseDay(items: string[]): DayMenu {
-  console.log(items);
   return {
     salada: cleanText(
       items.find((i) => i.includes("Salada:"))?.replace("– Salada:", "") || "",
@@ -70,7 +69,6 @@ export async function scrapeSesc24Maio(): Promise<ScrapedMenu> {
         items: [],
       };
       diasBrutos.push(currentDay);
-      console.log(currentDay);
       return;
     }
 

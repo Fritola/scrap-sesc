@@ -157,7 +157,6 @@ export async function scrapeSescCasaVerde(): Promise<ScrapedMenu> {
     if (!text) return;
 
     const dayName = extractDay(text);
-    console.log("TESTE DIA:", text, "=>", dayName);
 
     // 🔹 Detecta novo dia
     if (dayName) {
