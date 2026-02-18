@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import morgan from "morgan";
 import { Pool } from "pg";
 import { getOrCreateMenu } from "./menuService.js";
 import { scrapeBySlug } from "./scrappers/index.js";
@@ -10,8 +11,9 @@ import { scrapeBySlug } from "./scrappers/index.js";
 const PORT = process.env.PORT || 3000;
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+app.use(morgan(':method :url :status :response-time ms'));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -96,11 +98,8 @@ app.get("/menu/:slug", async (req, res) => {
 
     const menu = await getOrCreateMenu(slug);
 
-    console.log(menu);
-
     return res.json(menu);
   } catch (error) {
-    console.log(error);
     return res.status(404).json({
       error: "Unidade não encontrada",
     });
@@ -108,14 +107,7 @@ app.get("/menu/:slug", async (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-  const uptimeInSeconds = process.uptime();
-
-  res.status(200).json({
-    status: "ok",
-    message: "Server is running",
-    uptime_seconds: Math.floor(uptimeInSeconds),
-    timestamp: new Date().toISOString(),
-  });
+  res.send("ok");
 });
 
 app.listen(PORT, () => {
