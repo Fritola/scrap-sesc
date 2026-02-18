@@ -107,6 +107,22 @@ app.get("/menu/:slug", async (req, res) => {
   }
 });
 
+app.get("/health", async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+
+    res.status(200).json({
+      status: "ok",
+      db: "connected",
+    });
+  } catch {
+    res.status(500).json({
+      status: "error",
+      db: "disconnected",
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
