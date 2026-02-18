@@ -107,20 +107,15 @@ app.get("/menu/:slug", async (req, res) => {
   }
 });
 
-app.get("/health", async (req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
+app.get("/health", (req, res) => {
+  const uptimeInSeconds = process.uptime();
 
-    res.status(200).json({
-      status: "ok",
-      db: "connected",
-    });
-  } catch {
-    res.status(500).json({
-      status: "error",
-      db: "disconnected",
-    });
-  }
+  res.status(200).json({
+    status: "ok",
+    message: "Server is running",
+    uptime_seconds: Math.floor(uptimeInSeconds),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.listen(PORT, () => {
