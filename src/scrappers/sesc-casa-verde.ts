@@ -15,7 +15,7 @@ type DayMenu = {
 export type ScrapedMenu = {
   unidade: string;
   slug: string;
-  dias: { day: string; menu: DayMenu }[];
+  dias: { day: string; menu: DayMenu; dayNumber: string }[];
 };
 
 function cleanText(text: string) {
@@ -109,13 +109,16 @@ function parseDayCasaVerde(items: string[]): DayMenu {
   };
 }
 
-function extractDay(text: string): string | null {
+function extractDayInfo(text: string): { dayName: string; dayNumber: string } | null {
   const match = text.match(
-    /\d{2}\/\d{2}\s*\((segunda-feira|terça-feira|quarta-feira|quinta-feira|sexta-feira|sábado|domingo)\)/i,
+    /(\d{2}\/\d{2})\s*\((segunda-feira|terça-feira|quarta-feira|quinta-feira|sexta-feira|sábado|domingo)\)/i,
   );
 
   if (match) {
-    return match[1]?.toLowerCase() ?? "";
+    return {
+      dayNumber: match[1] ?? "",
+      dayName: match[2]?.toLowerCase() ?? ""
+    };
   }
 
   return null;
@@ -128,9 +131,9 @@ export async function scrapeSescCasaVerde(): Promise<ScrapedMenu> {
   const { data } = await axios.get(url);
   const $ = cheerio.load(data);
 
-  const diasBrutos: { day: string; items: string[] }[] = [];
+  const diasBrutos: { day: string; dayNumber: string; items: string[] }[] = [];
 
-  let currentDay: { day: string; items: string[] } | null = null;
+  let currentDay: { day: string; dayNumber: string; items: string[] } | null = null;
 
   $(".principal--post--conteudo")
     .children()
@@ -157,17 +160,18 @@ export async function scrapeSescCasaVerde(): Promise<ScrapedMenu> {
   function processText(text: string) {
     if (!text) return;
 
-    const dayName = extractDay(text);
+    const dayInfo = extractDayInfo(text);
 
     // 🔹 Detecta novo dia
-    if (dayName) {
+    if (dayInfo) {
       if (text.toLowerCase().includes("fechada")) {
         currentDay = null;
         return;
       }
 
       currentDay = {
-        day: dayName,
+        day: dayInfo.dayName,
+        dayNumber: dayInfo.dayNumber,
         items: [],
       };
 
@@ -181,10 +185,13 @@ export async function scrapeSescCasaVerde(): Promise<ScrapedMenu> {
     }
   }
 
-  const diasEstruturados: Record<string, DayMenu> = {};
+  const diasEstruturados: Record<string, { menu: DayMenu; dayNumber: string }> = {};
 
   for (const dia of diasBrutos) {
-    diasEstruturados[dia.day] = parseDayCasaVerde(dia.items);
+    diasEstruturados[dia.day] = {
+      menu: parseDayCasaVerde(dia.items),
+      dayNumber: (dia as any).dayNumber
+    };
   }
 
   const unidade = "Sesc Casa Verde";

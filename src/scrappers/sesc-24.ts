@@ -13,7 +13,7 @@ type DayMenu = {
 export type ScrapedMenu = {
   unidade: string;
   slug: string;
-  dias: { day: string; menu: DayMenu }[];
+  dias: { day: string; menu: DayMenu; dayNumber: string }[];
 };
 
 function cleanText(text: string) {
@@ -86,7 +86,7 @@ export async function scrapeSesc24Maio(): Promise<ScrapedMenu> {
     }
   });
 
-  const diasEstruturados: Record<string, DayMenu> = {};
+  const diasEstruturados: Record<string, { menu: DayMenu; dayNumber: string }> = {};
   function slugify(text: string) {
     return text
       .normalize("NFD")
@@ -109,7 +109,14 @@ export async function scrapeSesc24Maio(): Promise<ScrapedMenu> {
   for (const dia of diasBrutos) {
     const nomeDia = extractDayName(dia.day) ?? "";
     if (dia.items.length === 0) continue;
-    diasEstruturados[nomeDia] = parseDay(dia.items);
+
+    // Extrai o número do dia (ex: 18/02)
+    const dayNumber = dia.day.match(/\d{2}\/\d{2}/)?.[0] ?? "";
+
+    diasEstruturados[nomeDia] = {
+      menu: parseDay(dia.items),
+      dayNumber
+    };
   }
 
   return {

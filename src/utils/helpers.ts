@@ -1,4 +1,4 @@
-export function sortDays<T>(days: Record<string, T>): { day: string; menu: T }[] {
+export function sortDays<T>(days: Record<string, { menu: T, dayNumber: string }>): { day: string; menu: T; dayNumber: string }[] {
     const order = [
         "segunda-feira",
         "terça-feira",
@@ -9,7 +9,7 @@ export function sortDays<T>(days: Record<string, T>): { day: string; menu: T }[]
         "domingo",
     ];
 
-    const sorted: { day: string; menu: T }[] = [];
+    const sorted: { day: string; menu: T; dayNumber: string }[] = [];
 
     // Find all keys that match our order
     order.forEach((targetDay) => {
@@ -17,7 +17,8 @@ export function sortDays<T>(days: Record<string, T>): { day: string; menu: T }[]
         if (key && days[key] !== undefined) {
             sorted.push({
                 day: key,
-                menu: days[key] as T
+                menu: days[key].menu,
+                dayNumber: days[key].dayNumber
             });
         }
     });
@@ -27,7 +28,8 @@ export function sortDays<T>(days: Record<string, T>): { day: string; menu: T }[]
         if (!order.includes(key.toLowerCase()) && days[key] !== undefined) {
             sorted.push({
                 day: key,
-                menu: days[key] as T
+                menu: days[key].menu,
+                dayNumber: days[key].dayNumber
             });
         }
     });
