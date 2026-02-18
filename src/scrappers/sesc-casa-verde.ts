@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { sortDays } from "../utils/helpers.js";
 
 type DayMenu = {
   salada?: string;
@@ -14,7 +15,7 @@ type DayMenu = {
 export type ScrapedMenu = {
   unidade: string;
   slug: string;
-  dias: Record<string, DayMenu>;
+  dias: { day: string; menu: DayMenu }[];
 };
 
 function cleanText(text: string) {
@@ -191,6 +192,6 @@ export async function scrapeSescCasaVerde(): Promise<ScrapedMenu> {
   return {
     unidade,
     slug: slugify(unidade),
-    dias: diasEstruturados,
+    dias: sortDays(diasEstruturados),
   };
 }
