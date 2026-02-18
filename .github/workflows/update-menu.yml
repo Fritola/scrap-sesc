@@ -1,0 +1,16 @@
+name: Atualizar Cardápios
+
+on:
+  schedule:
+    - cron: "0 10 * * 0" # Domingo 07:00 BRT
+    - cron: "0 13 * * 0" # Domingo 10:00 BRT
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar endpoint protegido
+        run: |
+          curl -X POST https://scrap-sesc.onrender.com/menu/update-all \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

@@ -59,6 +59,10 @@ app.post("/menu", async (req, res) => {
 });
 
 app.post("/menu/update-all", async (req, res) => {
+  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const slugs = ["sesc-casa-verde", "sesc-24-de-maio"];
 
