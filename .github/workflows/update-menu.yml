@@ -2,8 +2,8 @@ name: Atualizar Cardápios
 
 on:
   schedule:
-    - cron: "0 10 * * 0" # Domingo 07:00 BRT
-    - cron: "0 13 * * 0" # Domingo 10:00 BRT
+    - cron: "0 10 * * 0" 
+    - cron: "0 13 * * 0" 
   workflow_dispatch:
 
 jobs:
