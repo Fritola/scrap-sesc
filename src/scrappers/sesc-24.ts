@@ -12,7 +12,7 @@ type DayMenu = {
 export type ScrapedMenu = {
   unidade: string;
   slug: string;
-  dias: Record<string, any>;
+  dias: Record<string, DayMenu>;
 };
 
 function cleanText(text: string) {
@@ -59,30 +59,24 @@ export async function scrapeSesc24Maio(): Promise<ScrapedMenu> {
 
   $(".principal--post--conteudo p").each((_, el) => {
     const text = $(el).text().trim();
-
     if (!text) return;
 
-    // Detecta início de um dia
-    if (text.startsWith("Dia")) {
-      currentDay = {
-        day: text,
-        items: [],
-      };
-      diasBrutos.push(currentDay);
-      return;
-    }
-
-    // Se aparecer "Unidade Fechada", consideramos dia vazio
-    if (text.includes("Unidade Fechada")) {
-      return;
-    }
-
-    // Ignorar lixo institucional
     if (
       text.includes("Serviço Social do Comércio") ||
       text.includes("Política de Cookies") ||
       text.includes("Sesc São Paulo por aí")
-    ) {
+    ) return;
+
+    if (text.includes("Unidade Fechada")) {
+      console.log(`⚠️ Pulando dia fechado: ${text}`);
+      currentDay = null;
+      return;
+    }
+
+    const dayMatch = text.match(/\d{2}\/\d{2}\s+\((.*?)\)/);
+    if (dayMatch) {
+      currentDay = { day: text, items: [] };
+      diasBrutos.push(currentDay);
       return;
     }
 
@@ -91,29 +85,29 @@ export async function scrapeSesc24Maio(): Promise<ScrapedMenu> {
     }
   });
 
-  // Converte para estrutura final
   const diasEstruturados: Record<string, DayMenu> = {};
   function slugify(text: string) {
     return text
-      .normalize("NFD") // separa acentos
-      .replace(/[\u0300-\u036f]/g, "") // remove acentos
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "") // remove caracteres especiais
+      .replace(/[^a-z0-9\s-]/g, "")
       .trim()
-      .replace(/\s+/g, "-") // espaço vira -
-      .replace(/-+/g, "-"); // evita múltiplos -
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
   }
+
   const tituloCompleto = $(".principal--post--cabecalho--titulo")
     .first()
     .text()
     .trim();
 
   const unidade = tituloCompleto.split("–").pop()?.trim() || tituloCompleto;
-
   const slug = slugify(unidade);
 
   for (const dia of diasBrutos) {
-    const nomeDia = extractDayName(dia.day) || "";
+    const nomeDia = extractDayName(dia.day) ?? "";
+    if (dia.items.length === 0) continue;
     diasEstruturados[nomeDia] = parseDay(dia.items);
   }
 
